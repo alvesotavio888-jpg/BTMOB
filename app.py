@@ -16,6 +16,10 @@ from models import db, User, Campaign, Victim, Log
 app = Flask(__name__)
 app.config.from_object(Config)
 
+# Create required folders on startup
+for d in [Config.UPLOAD_FOLDER_APPS, Config.UPLOAD_FOLDER_ICONS, Config.UPLOAD_FOLDER_BUILT, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'builder')]:
+    os.makedirs(d, exist_ok=True)
+
 db.init_app(app)
 login_manager = LoginManager()
 login_manager.init_app(app)
