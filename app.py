@@ -409,5 +409,5 @@ def playstore_page(token):
     download_url = f"{Config.PANEL_DOMAIN}/download/{campaign.download_token}"
     return render_template('playstore.html', campaign=campaign, icon_url=icon_url, download_url=download_url)
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+# Railway entry point - gunicorn calls this directly
+port = int(os.environ.get('PORT', 5000))
